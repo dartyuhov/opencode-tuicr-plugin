@@ -90,9 +90,14 @@ after CI succeeds. Increment the `version` in `package.json` and the Herdr
 manifest together before each release. Every npm version can be published only
 once.
 
+Add a non-empty matching section to the local `CHANGELOG.md` before running
+`npm run verify`. The publish workflow and the post-publish GitHub Release both
+use this committed local changelog; generated GitHub notes are not a substitute.
+
 Releases use npm Trusted Publishing through GitHub Actions OIDC and include npm
 provenance. Configure the npm trusted publisher for this repository and
-`publish.yml` before publishing from a fork.
+`publish.yml` before publishing from a fork. The `GitHub Release` workflow then
+creates tag `vVERSION` and a release titled `PACKAGE@VERSION` after publication.
 
 Do not run `npm publish` locally.
 

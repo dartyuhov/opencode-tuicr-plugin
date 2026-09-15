@@ -1,0 +1,70 @@
+name: GitHub Release
+
+on:
+  workflow_run:
+    workflows: [Publish]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Read package metadata
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "name=$(node -p "require('./package.json').name")" >> "$GITHUB_OUTPUT"
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Validate local changelog
+        run: node scripts/check-changelog.mjs
+
+      - name: Extract changelog section
+        env:
+          VERSION: ${{ steps.package.outputs.version }}
+        run: |
+          node --input-type=commonjs <<'NODE'
+          const { readFileSync, writeFileSync } = require("node:fs")
+
+          const version = process.env.VERSION
+          const changelog = readFileSync("CHANGELOG.md", "utf8")
+          const escaped = version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+          const heading = new RegExp(`^##\\s+\\[?${escaped}\\]?(?:\\s|$).*$`, "m")
+          const match = heading.exec(changelog)
+
+          if (!match) throw new Error(`CHANGELOG.md has no section for ${version}`)
+
+          const start = match.index
+          const bodyStart = start + match[0].length
+          const next = /^##\s+/m.exec(changelog.slice(bodyStart))
+          const end = next ? bodyStart + next.index : changelog.length
+          writeFileSync("release-notes.md", `${changelog.slice(start, end).trim()}\n`)
+          NODE
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          PACKAGE_NAME: ${{ steps.package.outputs.name }}
+          VERSION: ${{ steps.package.outputs.version }}
+        run: |
+          set -euo pipefail
+          tag="v${VERSION}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "GitHub Release $tag already exists; skipping."
+          else
+            gh release create "$tag" \
+              --target "$HEAD_SHA" \
+              --title "${PACKAGE_NAME}@${VERSION}" \
+              --notes-file release-notes.md
+          fi
