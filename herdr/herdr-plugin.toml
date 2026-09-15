@@ -1,6 +1,6 @@
 id = "opencode-tuicr"
 name = "OpenCode tuicr review"
-version = "0.1.0"
+version = "0.1.1"
 min_herdr_version = "0.9.0"
 description = "Launch tuicr reviews from OpenCode"
 platforms = ["macos", "linux"]

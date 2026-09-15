@@ -34,7 +34,7 @@ global OpenCode configuration:
 
 OpenCode installs npm plugins automatically at startup. Pin the plugin to an
 exact version when you want repeatable updates, for example
-`opencode-tuicr-plugin@0.1.0`.
+`opencode-tuicr-plugin@0.1.1`.
 
 Install the companion Herdr pane plugin from GitHub:
 
@@ -90,10 +90,9 @@ after CI succeeds. Increment the `version` in `package.json` and the Herdr
 manifest together before each release. Every npm version can be published only
 once.
 
-The first release uses a short-lived npm token in GitHub Actions. After that
-release appears on npm, configure npm Trusted Publishing for this repository
-and `publish.yml`, then remove the token workflow secret. Future releases use
-GitHub Actions OIDC and npm provenance.
+Releases use npm Trusted Publishing through GitHub Actions OIDC and include npm
+provenance. Configure the npm trusted publisher for this repository and
+`publish.yml` before publishing from a fork.
 
 Do not run `npm publish` locally.
 

@@ -1,6 +1,6 @@
 {
   "name": "opencode-tuicr-plugin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenCode TUI plugin that launches tuicr reviews from Herdr.",
   "type": "module",
   "main": "./dist/opencode-tuicr-plugin.js",
@@ -49,39 +49,9 @@
   "publishConfig": {
     "access": "public"
   },
-  "peerDependencies": {
-    "@opencode-ai/plugin": ">=1.4.10 <2.0.0"
-  },
   "devDependencies": {
     "@opencode-ai/plugin": "1.4.10",
     "@types/node": "^26.5.1",
     "typescript": "^7.0.2"
-  },
-  "directories": {
-    "test": "test"
-  },
-  "dependencies": {
-    "cross-spawn": "^7.0.6",
-    "detect-libc": "^2.1.2",
-    "effect": "^4.0.0-beta.48",
-    "fast-check": "^4.10.0",
-    "find-my-way-ts": "^0.1.6",
-    "ini": "^6.0.0",
-    "isexe": "^2.0.0",
-    "kubernetes-types": "^1.30.0",
-    "msgpackr": "^1.12.1",
-    "msgpackr-extract": "^3.0.4",
-    "multipasta": "^0.2.8",
-    "node-gyp-build-optional-packages": "^5.2.2",
-    "path-key": "^3.1.1",
-    "pure-rand": "^8.4.2",
-    "shebang-command": "^2.0.0",
-    "shebang-regex": "^3.0.0",
-    "toml": "^4.3.0",
-    "undici-types": "^8.9.0",
-    "uuid": "^13.0.2",
-    "which": "^2.0.2",
-    "yaml": "^2.9.1",
-    "zod": "^4.1.8"
   }
 }

@@ -26,8 +26,6 @@ jobs:
       - run: npm ci
       - run: npm run verify
       - name: Publish if the version is new
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
           package_name="$(node -p "require('./package.json').name")"
