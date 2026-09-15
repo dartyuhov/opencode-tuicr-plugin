@@ -1,0 +1,14 @@
+id = "opencode-tuicr"
+name = "OpenCode tuicr review"
+version = "0.1.0"
+min_herdr_version = "0.9.0"
+description = "Launch tuicr reviews from OpenCode"
+platforms = ["macos", "linux"]
+
+[[panes]]
+id = "review"
+title = "tuicr review"
+placement = "popup"
+width = "90%"
+height = "90%"
+command = ["node", "runner.mjs"]
