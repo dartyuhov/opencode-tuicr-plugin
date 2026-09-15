@@ -1,0 +1,47 @@
+name: Publish
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - run: npm ci
+      - run: npm run verify
+      - name: Publish if the version is new
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          package_name="$(node -p "require('./package.json').name")"
+          package_version="$(node -p "require('./package.json').version")"
+          lookup_error="$(mktemp)"
+          if npm view "${package_name}@${package_version}" version --registry=https://registry.npmjs.org > /dev/null 2>"${lookup_error}"; then
+            echo "${package_name}@${package_version} already exists; skipping."
+          else
+            lookup_status=$?
+            if grep -Eq "E404|404 Not Found|is not in this registry" "${lookup_error}"; then
+              npm publish --provenance --access public
+            else
+              cat "${lookup_error}" >&2
+              exit "${lookup_status}"
+            fi
+          fi
+          rm -f "${lookup_error}"
